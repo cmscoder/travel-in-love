@@ -6,7 +6,7 @@ function Header(){
   return(
     <header>
       <Link className="logo" to="/">Travel In Love</Link>
-      <Link className="favorites" to="favorites">My favorite cities</Link>
+      <Link className="favorites" to="favorites">My favorite movies</Link>
     </header>
   )
 }

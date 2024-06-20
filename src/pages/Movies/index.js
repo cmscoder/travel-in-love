@@ -1,12 +1,15 @@
 import {useEffect, useState} from 'react';
-import {useParams} from 'react-router-dom';
+import {useParams, useNavigate} from 'react-router-dom';
 import './movie-info.css';
 import api from '../../services/api';
+import {toast} from 'react-toastify'
 
 
 
 function Movies() {
   const {id} = useParams();
+  const navigate = useNavigate();
+
   const [movie, setMovie] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -21,7 +24,8 @@ function Movies() {
       setMovie(response.data);
       setLoading(false);
     }).catch(() => {
-      console.log("MOVIE NOT FOUND!")
+      navigate("/", {replace: true})
+      return;
     })
 
   }
@@ -33,8 +37,27 @@ function Movies() {
     console.log("COMPONENTE FOI DESMONTADO")
   }
 
-  }, [])
+  }, [navigate, id])
 
+
+  function saveMovie(){
+    const myMoviesList = localStorage.getItem("@favoritemoviesflix");
+
+    let savedMovies = JSON.parse(myMoviesList) || [];
+
+    const hasMovie = savedMovies.some((movies) => movies.id === movie.id)
+
+    if(hasMovie) {
+
+      toast.warn("This movie is already in your list")
+      return;
+    }
+
+    savedMovies.push(movie);
+    localStorage.setItem("@favoritemoviesflix", JSON.stringify(savedMovies));
+    toast.success("MOVIE SAVED WITH SUCCESS!")
+
+  }
 
   if(loading) {
     return(
@@ -55,12 +78,12 @@ function Movies() {
       <strong>Vote: {movie.vote_average} /10 </strong>
 
       <div className='area-buttons'>
-    <button>Save</button>
-    <button>
-      <a href="#">
-        Trailer
-      </a>
-    </button>
+        <button onClick={saveMovie}>Save</button>
+        <button>
+          <a target="_blank" rel="external" href={`https://youtube.com/results?search_query=${movie.title} Trailer`}>
+            Trailer
+          </a>
+        </button>
       </div>
     </div>
   )
